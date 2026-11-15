@@ -1,0 +1,74 @@
+{
+   "blockdevices": [
+      {
+         "name": "nvme0n1",
+         "path": "/dev/nvme0n1",
+         "size": 1024209543168,
+         "type": "disk",
+         "rota": false,
+         "tran": "nvme",
+         "mountpoint": null,
+         "fstype": null,
+         "model": "SAMSUNG MZVL21T0HCLR-00B00",
+         "vendor": null,
+         "serial": "S676NF0T412345",
+         "children": [
+            {
+               "name": "nvme0n1p1",
+               "path": "/dev/nvme0n1p1",
+               "size": 536870912,
+               "type": "part",
+               "rota": false,
+               "tran": null,
+               "mountpoint": "/boot/efi",
+               "fstype": "vfat",
+               "model": null,
+               "vendor": null,
+               "serial": null
+            },
+            {
+               "name": "nvme0n1p2",
+               "path": "/dev/nvme0n1p2",
+               "size": 1023671631872,
+               "type": "part",
+               "rota": false,
+               "tran": null,
+               "mountpoint": "/",
+               "fstype": "ext4",
+               "model": null,
+               "vendor": null,
+               "serial": null
+            }
+         ]
+      },
+      {
+         "name": "sda",
+         "path": "/dev/sda",
+         "size": 2000398934016,
+         "type": "disk",
+         "rota": true,
+         "tran": "sata",
+         "mountpoint": null,
+         "fstype": null,
+         "model": "ST2000LM007-1R8174",
+         "vendor": "Seagate",
+         "serial": "WDE89012",
+         "children": [
+            {
+               "name": "sda1",
+               "path": "/dev/sda1",
+               "size": 2000397885440,
+               "type": "part",
+               "rota": true,
+               "tran": null,
+               "mountpoint": "/mnt/data",
+               "fstype": "ext4",
+               "model": null,
+               "vendor": null,
+               "serial": null
+            }
+         ]
+      }
+   ]
+}
+

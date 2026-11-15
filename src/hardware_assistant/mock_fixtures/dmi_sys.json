@@ -1,0 +1,15 @@
+{
+   "product_name": "21AH0015US (ThinkPad T14 Gen 3)",
+   "sys_vendor": "LENOVO",
+   "bios_version": "N3MET08W (1.08 )",
+   "bios_date": "06/20/2023",
+   "chassis_type": "10",
+   "battery_percentage": 87,
+   "battery_status": "Discharging",
+   "battery_present": true,
+   "hostname": "thinkpad-linux",
+   "os_name": "Ubuntu",
+   "os_version": "22.04.4 LTS (Jammy Jellyfish)",
+   "kernel_release": "6.5.0-28-generic"
+}
+

@@ -1,0 +1,39 @@
+Slot:	00:00.0
+Class:	Host bridge
+Vendor:	Intel Corporation
+Device:	12th Gen Core Processor Host Bridge/DRAM Registers
+SVendor:	Lenovo
+SDevice:	ThinkPad T14 Gen 3
+
+Slot:	00:02.0
+Class:	VGA compatible controller
+Vendor:	Intel Corporation
+Device:	Alder Lake-P Integrated Graphics Controller
+SVendor:	Lenovo
+SDevice:	ThinkPad T14 Gen 3
+Driver:	i915
+
+Slot:	01:00.0
+Class:	3D controller
+Vendor:	NVIDIA Corporation
+Device:	GA107M [GeForce RTX 3050 Mobile]
+SVendor:	Lenovo
+SDevice:	ThinkPad T14 Gen 3
+Driver:	nvidia
+
+Slot:	00:0e.0
+Class:	RAID bus controller
+Vendor:	Intel Corporation
+Device:	Volume Management Device NVMe RAID Controller
+SVendor:	Lenovo
+SDevice:	ThinkPad T14 Gen 3
+Driver:	vmd
+
+Slot:	00:14.3
+Class:	Network controller
+Vendor:	Intel Corporation
+Device:	Alder Lake-P PCH CNVi WiFi
+SVendor:	Intel Corporation
+SDevice:	Wi-Fi 6 AX211 160MHz
+Driver:	iwlwifi
+

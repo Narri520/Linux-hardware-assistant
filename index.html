@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Laptop Hardware Q&A Assistant — Live Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0d1117;
+            --panel-bg: #161b22;
+            --terminal-bg: #090d13;
+            --border: #30363d;
+            --text-main: #c9d1d9;
+            --text-dim: #8b949e;
+            --accent-green: #2ea043;
+            --accent-blue: #58a6ff;
+            --accent-cyan: #39c5cf;
+            --accent-yellow: #d29922;
+            --accent-purple: #bc8cff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+        }
+
+        .header {
+            text-align: center;
+            max-width: 840px;
+            margin-bottom: 24px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-green { background: rgba(46, 160, 67, 0.15); color: #3fb950; border: 1px solid rgba(46, 160, 67, 0.4); }
+        .badge-blue { background: rgba(88, 166, 255, 0.15); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.4); }
+        .badge-yellow { background: rgba(210, 153, 34, 0.15); color: #d29922; border: 1px solid rgba(210, 153, 34, 0.4); }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f0f6fc;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            background: #1f242c;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+
+        .terminal-title {
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .quick-prompts {
+            display: flex;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .quick-btn {
+            background: #21262d;
+            border: 1px solid #363b42;
+            color: #c9d1d9;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .quick-btn:hover {
+            background: #30363d;
+            border-color: #8b949e;
+            color: #ffffff;
+        }
+
+        .terminal-body {
+            background: var(--terminal-bg);
+            padding: 20px;
+            height: 480px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 16px;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-line {
+            color: #f0f6fc;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .prompt-symbol {
+            color: #3fb950;
+            font-weight: 600;
+        }
+
+        .tool-call {
+            margin: 8px 0 8px 18px;
+            color: var(--accent-cyan);
+            font-size: 12.5px;
+            background: rgba(57, 197, 207, 0.08);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 6px 10px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .assistant-line {
+            margin-top: 6px;
+            margin-left: 18px;
+            color: #e6edf3;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 14px;
+            border-radius: 6px;
+            border-left: 3px solid #3fb950;
+        }
+
+        .assistant-tag {
+            font-weight: 600;
+            color: #3fb950;
+            margin-bottom: 4px;
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .privilege-note {
+            margin-top: 8px;
+            margin-left: 18px;
+            padding: 8px 12px;
+            background: rgba(210, 153, 34, 0.1);
+            border-left: 3px solid #d29922;
+            color: #e3b341;
+            font-size: 12px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .input-bar {
+            display: flex;
+            align-items: center;
+            background: #161b22;
+            border-top: 1px solid var(--border);
+            padding: 12px 16px;
+            gap: 10px;
+        }
+
+        .input-bar input {
+            flex: 1;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: #f0f6fc;
+            font-family: 'Fira Code', monospace;
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-bar input:focus {
+            border-color: #58a6ff;
+        }
+
+        .input-bar button {
+            background: #238636;
+            color: #ffffff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13.5px;
+            transition: background 0.2s;
+        }
+
+        .input-bar button:hover {
+            background: #2ea043;
+        }
+
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="badges">
+            <span class="badge badge-green">Read-Only Allowlist</span>
+            <span class="badge badge-blue">Zero Shell Expansion</span>
+            <span class="badge badge-yellow">SMBIOS Sudoers Isolation</span>
+        </div>
+        <h1>Linux Laptop Hardware Q&A Assistant</h1>
+        <p class="subtitle">
+            An offline-capable, tool-calling assistant that inspects machine telemetry via strictly controlled read-only system collectors (<code>/proc</code>, <code>/sys</code>, <code>lscpu</code>, <code>lsblk</code>, <code>dmidecode</code>, <code>lspci</code>) and generates grounded answers.
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="terminal-header">
+            <div class="window-controls">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+            </div>
+            <div class="terminal-title">hardware_assistant@thinkpad-t14: ~ (v0.1.0)</div>
+            <div style="font-size: 11px; color: #8b949e;">Local Sandbox Active</div>
+        </div>
+
+        <div class="quick-prompts">
+            <span style="font-size: 12px; color: #8b949e; align-self: center; margin-right: 4px;">Suggestions:</span>
+            <button class="quick-btn" onclick="sendPrompt('Can I add more RAM, and how much?')">Can I add more RAM, and how much?</button>
+            <button class="quick-btn" onclick="sendPrompt('and what about the GPU?')">and what about the GPU?</button>
+            <button class="quick-btn" onclick="sendPrompt('Is my SSD NVMe?')">Is my SSD NVMe?</button>
+            <button class="quick-btn" onclick="sendPrompt('What CPU do I have?')">What CPU do I have?</button>
+            <button class="quick-btn" onclick="sendPrompt('/tools')">/tools</button>
+            <button class="quick-btn" onclick="clearTerminal()">/clear</button>
+        </div>
+
+        <div class="terminal-body" id="terminal">
+            <div class="log-entry" style="color: #8b949e;">
+                Linux Laptop Hardware Assistant CLI initialized.<br>
+                Diagnostics Runner: Mock Linux Laptop (Lenovo ThinkPad T14 Gen 3 / Ubuntu 22.04)<br>
+                Type a hardware question below or click one of the suggested prompts above.
+            </div>
+        </div>
+
+        <div class="input-bar">
+            <span style="color: #3fb950; font-family: 'Fira Code', monospace; font-weight: 600;">hardware&gt;</span>
+            <input type="text" id="userInput" placeholder="Ask about RAM, CPU, SSD, GPU, or /tools..." autocomplete="off">
+            <button onclick="handleSubmit()">Send</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        GitHub Repository: <a href="https://github.com/Narri520/Linux-hardware-assistant" target="_blank">Narri520/Linux-hardware-assistant</a> • Built with Python &amp; Pydantic
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+        const userInput = document.getElementById('userInput');
+
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleSubmit();
+            }
+        });
+
+        function appendUserMessage(text) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<div class="user-line"><span class="prompt-symbol">hardware&gt;</span> <span>${escapeHtml(text)}</span></div>`;
+            terminal.appendChild(entry);
+            terminal.scrollTop = terminal.scrollHeight;
+            return entry;
+        }
+
+        function appendToolCall(entry, toolName, payloadSize) {
+            const toolDiv = document.createElement('div');
+            toolDiv.className = 'tool-call';
+            toolDiv.innerHTML = `⚙ Calling diagnostic tool: <strong>${toolName}()</strong><br><span style="opacity: 0.8; font-size: 11px;">✔ Normalized Payload: ${payloadSize} bytes | Grounded telemetry verified</span>`;
+            entry.appendChild(toolDiv);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function appendAssistantResponse(entry, answerText, privilegeNote = null) {
+            const ansDiv = document.createElement('div');
+            ansDiv.className = 'assistant-line';
+            ansDiv.innerHTML = `<span class="assistant-tag">Assistant</span>${answerText}`;
+            entry.appendChild(ansDiv);
+
+            if (privilegeNote) {
+                const privDiv = document.createElement('div');
+                privDiv.className = 'privilege-note';
+                privDiv.innerHTML = `<strong>Privilege Note:</strong> ${privilegeNote}`;
+                entry.appendChild(privDiv);
+            }
+
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearTerminal() {
+            terminal.innerHTML = `<div class="log-entry" style="color: #8b949e;">Conversation memory cleared.<br>Type a hardware question below.</div>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sendPrompt(text) {
+            userInput.value = text;
+            handleSubmit();
+        }
+
+        function handleSubmit() {
+            const query = userInput.value.trim();
+            if (!query) return;
+            userInput.value = '';
+
+            const entry = appendUserMessage(query);
+            const lower = query.toLowerCase();
+
+            if (lower === '/clear' || lower === '/reset') {
+                clearTerminal();
+                return;
+            }
+
+            if (lower === '/tools') {
+                setTimeout(() => {
+                    appendAssistantResponse(entry, `
+                        <strong>Safe Diagnostic Tool Allowlist:</strong><br>
+                        • <code>get_memory_info</code>: Inspects RAM usage and physical motherboard memory slots/upgradeability.<br>
+                        • <code>get_cpu_info</code>: Inspects processor architecture, core/thread count, frequencies, and virtualization.<br>
+                        • <code>get_storage_info</code>: Inspects block storage disks and partitions, detecting NVMe vs SATA and SSD vs HDD.<br>
+                        • <code>get_gpu_and_pci_info</code>: Inspects integrated and discrete graphics cards on PCI bus.<br>
+                        • <code>get_system_overview</code>: Inspects laptop hardware model, manufacturer, BIOS, and battery percentage.
+                    `);
+                }, 150);
+                return;
+            }
+
+            // Simulate agentic tool selection and grounding
+            setTimeout(() => {
+                if (lower.includes('ram') || lower.includes('memory') || lower.includes('slot') || lower.includes('add') || lower.includes('upgrade')) {
+                    appendToolCall(entry, 'get_memory_info', 671);
+                    setTimeout(() => {
+                        if (lower.includes('add') || lower.includes('upgrade') || lower.includes('more')) {
+                            appendAssistantResponse(
+                                entry,
+                                'You have <strong>16 GB</strong> in 1 of 2 slots. The board supports up to <strong>64.0 GB</strong>, so you can add a stick of up to <strong>32 GB</strong> in the 1 empty slot.'
+                            );
+                        } else {
+                            appendAssistantResponse(
+                                entry,
+                                'You have <strong>15.4 GB</strong> of physical RAM installed (4.0 GB used, 10.9 GB available across 2 SODIMM slots).'
+                            );
+                        }
+                    }, 300);
+                } else if (lower.includes('gpu') || lower.includes('graphics') || lower.includes('video') || lower.includes('nvidia') || lower.includes('intel')) {
+                    appendToolCall(entry, 'get_gpu_and_pci_info', 1827);
+                    setTimeout(() => {
+                        appendAssistantResponse(
+                            entry,
+                            'Your laptop has <strong>2 graphics controller(s)</strong>:<br>' +
+                            '• Intel Corporation Alder Lake-P Integrated Graphics Controller<br>' +
+                            '• NVIDIA Corporation GA107M [GeForce RTX 3050 Mobile]'
+                        );
+                    }, 300);
+                } else if (lower.includes('ssd') || lower.includes('nvme') || lower.includes('disk') || lower.includes('storage') || lower.includes('drive')) {
+                    appendToolCall(entry, 'get_storage_info', 937);
+                    setTimeout(() => {
+                        appendAssistantResponse(
+                            entry,
+                            'Yes, your primary storage drive <code>nvme0n1</code> (953.9 GB) is a high-speed <strong>NVMe PCIe SSD</strong> (SAMSUNG MZVL21T0HCLR-00B00). You also have a secondary 1.8 TB SATA drive (<code>sda</code>).'
+                        );
+                    }, 300);
+                } else if (lower.includes('cpu') || lower.includes('processor') || lower.includes('core')) {
+                    appendToolCall(entry, 'get_cpu_info', 840);
+                    setTimeout(() => {
+                        appendAssistantResponse(
+                            entry,
+                            'You have an <strong>12th Gen Intel(R) Core(TM) i7-12700H</strong> processor with <strong>14 physical cores</strong> and <strong>16 logical threads</strong> running up to <strong>4.7 GHz</strong>. Hardware virtualization (<code>VT-x</code>) is supported.'
+                        );
+                    }, 300);
+                } else if (lower.includes('battery') || lower.includes('model') || lower.includes('laptop') || lower.includes('os') || lower.includes('specs') || lower.includes('system')) {
+                    appendToolCall(entry, 'get_system_overview', 512);
+                    setTimeout(() => {
+                        appendAssistantResponse(
+                            entry,
+                            'System: <strong>LENOVO ThinkPad T14 Gen 3</strong> running <strong>Ubuntu 22.04.4 LTS</strong> (Kernel 6.5.0-28-generic). Battery is at <strong>87% (Discharging)</strong>.'
+                        );
+                    }, 300);
+                } else {
+                    appendAssistantResponse(
+                        entry,
+                        'I don’t know based on available system diagnostics. I can inspect CPU, RAM, NVMe/SSD, GPU, battery, and system specs. What component would you like to check?'
+                    );
+                }
+            }, 250);
+        }
+    </script>
+</body>
+</html>
